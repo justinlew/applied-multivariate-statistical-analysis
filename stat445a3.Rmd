@@ -44,10 +44,55 @@ abline(h=0.646, lty=2)
 ```
 
 ## Question 2
-
+a)
 ```{r}
 fat_dat <- read.table("~/Documents/SFU/STAT445/a1/fat_dat.txt", quote="\"", comment.char="")
 colMeans(fat_dat)
 var(fat_dat)
+n <- nrow(fat_dat)
+ncol(fat_dat)
+si <- diag(var(fat_dat))
+t <- matrix(qt(0.975, df=nrow(fat_dat)-1), 19, 1)
+cbind(colMeans(fat_dat) - t*sqrt(si/n), colMeans(fat_dat) + t*sqrt(si/n))
+
 ```
 
+
+b)
+
+```{r}
+fat_dat[, c(11, 12)]
+variance <- var(fat_dat[,c(11,12)])
+means <- colMeans(fat_dat[,c(11,12)])
+means
+variance
+n
+head(fat_dat)
+plot(ellipse(variance/n, centre=means, t=sqrt(((2*(n-1)/(n-2))*qf(0.95, 2, n-2))))
+     ,type="l")
+```
+c) Bonferroni Confidence Intervals for the 
+
+```{r}
+circData <- fat_dat[,10:19]
+m <- ncol(circData)
+t2 <- -qt(0.05/(2*m), df=n-1, lower.tail=TRUE)
+intervals <- rbind(colMeans(circData) - t2*sqrt(diag(var(circData))/n), colMeans(circData) + t2*sqrt(diag(var(circData))/n))
+
+chestInt <- intervals[,2]
+chestInt[1]
+abInt <- intervals[,3]
+abInt
+```
+
+d)
+```{r}
+plot(ellipse(variance/n, centre=means, t=sqrt(((2*(n-1)/(n-2))*qf(0.95, 2, n-2))))
+     ,type="l", xlim=c(99, 103), ylim=c(90, 95))
+abline(v=chestInt[1])
+abline(v=chestInt[2])
+abline(h=abInt[1])
+abline(h=abInt[2])
+```
+
+e) 
