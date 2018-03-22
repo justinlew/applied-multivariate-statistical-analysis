@@ -23,7 +23,7 @@ xbar
 a) Find the 95% confidence region for the mean vector $\mu = \begin{bmatrix} \mu_{1} \\ \mu_{2} \end{bmatrix}$.
 
 ```{r}
-install.packages("ellipse")
+#install.packages("ellipse")
 library(ellipse)
 ```
 
@@ -46,14 +46,12 @@ abline(h=0.646, lty=2)
 ## Question 2
 a)
 ```{r}
-fat_dat <- read.table("~/Documents/SFU/STAT445/a1/fat_dat.txt", quote="\"", comment.char="")
-colMeans(fat_dat)
-var(fat_dat)
+data <- read.table("~/Documents/SFU/STAT445/a1/fat_dat.txt", quote="\"", comment.char="")
+fat_dat <- data[,10:19]
 n <- nrow(fat_dat)
-ncol(fat_dat)
-si <- diag(var(fat_dat))
-t <- matrix(qt(0.975, df=nrow(fat_dat)-1), 19, 1)
-cbind(colMeans(fat_dat) - t*sqrt(si/n), colMeans(fat_dat) + t*sqrt(si/n))
+p <- ncol(fat_dat)
+F <- qf(0.95, n, n-p)
+cbind(colMeans(fat_dat) - sqrt((p*(n-1)/(n-p))*F)*sqrt(diag(var(fat_dat))/n),colMeans(fat_dat) + sqrt((p*(n-1)/(n-p))*F)*sqrt(diag(var(fat_dat))/n))
 
 ```
 
@@ -61,38 +59,42 @@ cbind(colMeans(fat_dat) - t*sqrt(si/n), colMeans(fat_dat) + t*sqrt(si/n))
 b)
 
 ```{r}
-fat_dat[, c(11, 12)]
-variance <- var(fat_dat[,c(11,12)])
-means <- colMeans(fat_dat[,c(11,12)])
-means
-variance
-n
-head(fat_dat)
-plot(ellipse(variance/n, centre=means, t=sqrt(((2*(n-1)/(n-2))*qf(0.95, 2, n-2))))
+variance <- var(fat_dat[,c(2,3)])
+means <- colMeans(fat_dat[,c(2,3)])
+plot(ellipse(variance/n, centre=means, t=sqrt(((p*(n-1)/(n-p))*qf(0.95, p, n-p))))
      ,type="l")
 ```
 c) Bonferroni Confidence Intervals for the 
 
 ```{r}
-circData <- fat_dat[,10:19]
+circData <- fat_dat
 m <- ncol(circData)
 t2 <- -qt(0.05/(2*m), df=n-1, lower.tail=TRUE)
 intervals <- rbind(colMeans(circData) - t2*sqrt(diag(var(circData))/n), colMeans(circData) + t2*sqrt(diag(var(circData))/n))
 
 chestInt <- intervals[,2]
-chestInt[1]
+chestInt
 abInt <- intervals[,3]
 abInt
 ```
 
 d)
 ```{r}
-plot(ellipse(variance/n, centre=means, t=sqrt(((2*(n-1)/(n-2))*qf(0.95, 2, n-2))))
-     ,type="l", xlim=c(99, 103), ylim=c(90, 95))
+
+plot(ellipse(variance/n, centre=means, t=sqrt(((p*(n-1)/(n-p))*qf(0.95, p, n-p)))), type="l")
 abline(v=chestInt[1])
 abline(v=chestInt[2])
 abline(h=abInt[1])
 abline(h=abInt[2])
 ```
 
-e) 
+e) The confidence interval for mean chest circumference - mean abdomen circumference is (7.44485, 9.091658).
+```{r}
+m_new = m + 1
+b <- matrix(0, 10, 1)
+b[2] <- 1
+b[3] <- -1
+t_new <- -qt(0.05/(2*m_new), df=n-1)
+cbind(t(b) %*% colMeans(circData) - t_new * sqrt((t(b) %*% var(circData) %*% b)/n),t(b) %*% colMeans(circData) + t_new * sqrt((t(b) %*% var(circData) %*% b)/n))
+```
+
