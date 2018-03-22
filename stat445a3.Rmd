@@ -1,0 +1,53 @@
+---
+title: "stat445_a3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## STAT 445 Assignment 3
+
+
+There are 42 observations from a bivariate normal distribution. The sample mean is given by $\bar{x} = \begin{bmatrix} 0.0564 \\ 0.603 \end{bmatrix}$. The sample variance is given by  $S = \begin{bmatrix} 0.0144 && 0.0117 \\ 0.0117 && 0.0146 \end{bmatrix}$ .
+```{r}
+S = matrix(c(0.0144, 0.0117, 0.0117, 0.0146), 2, 2)
+S
+xbar = matrix(c(0.564, 0.603), 2, 1)
+xbar
+```
+
+## Question 1
+
+a) Find the 95% confidence region for the mean vector $\mu = \begin{bmatrix} \mu_{1} \\ \mu_{2} \end{bmatrix}$.
+
+```{r}
+install.packages("ellipse")
+library(ellipse)
+```
+
+
+```{r}
+plot(ellipse(S/42, centre=xbar, t=sqrt(((2*41)/40)*qf(0.95, 2, 40) )), type="l", xlim=c(0.51, 0.630), ylim=c(0.5, 0.70))
+abline(h=0.565)
+abline(h=0.641)
+abline(v=0.527)
+abline(v=0.601)
+
+abline(v=0.521, lty=2)
+abline(v=0.607, lty=2)
+abline(h=0.560, lty=2)
+abline(h=0.646, lty=2)
+
+
+```
+
+## Question 2
+
+```{r}
+fat_dat <- read.table("~/Documents/SFU/STAT445/a1/fat_dat.txt", quote="\"", comment.char="")
+colMeans(fat_dat)
+var(fat_dat)
+```
+
