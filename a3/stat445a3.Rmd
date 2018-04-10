@@ -1,0 +1,102 @@
+---
+title: "stat445_a3"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## STAT 445 Assignment 3
+
+
+There are 42 observations from a bivariate normal distribution. The sample mean is given by $\bar{x} = \begin{bmatrix} 0.0564 \\ 0.603 \end{bmatrix}$. The sample variance is given by  $S = \begin{bmatrix} 0.0144 && 0.0117 \\ 0.0117 && 0.0146 \end{bmatrix}$ .
+```{r}
+S = matrix(c(0.0144, 0.0117, 0.0117, 0.0146), 2, 2)
+S
+xbar = matrix(c(0.564, 0.603), 2, 1)
+xbar
+```
+
+## Question 1
+
+a) Find the 95% confidence region for the mean vector $\mu = \begin{bmatrix} \mu_{1} \\ \mu_{2} \end{bmatrix}$.
+
+```{r}
+#install.packages("ellipse")
+library(ellipse)
+```
+
+
+```{r}
+plot(ellipse(S/42, centre=xbar, t=sqrt(((2*41)/40)*qf(0.95, 2, 40) )), type="l", xlim=c(0.51, 0.630), ylim=c(0.5, 0.70))
+abline(h=0.565)
+abline(h=0.641)
+abline(v=0.527)
+abline(v=0.601)
+
+abline(v=0.521, lty=2)
+abline(v=0.607, lty=2)
+abline(h=0.560, lty=2)
+abline(h=0.646, lty=2)
+
+
+```
+
+## Question 2
+a)
+```{r}
+data <- read.table("~/Documents/SFU/STAT445/a1/fat_dat.txt", quote="\"", comment.char="")
+fat_dat <- data[,10:19]
+n <- nrow(fat_dat)
+p <- ncol(fat_dat)
+F <- qf(0.95, n, n-p)
+cbind(colMeans(fat_dat) - sqrt((p*(n-1)/(n-p))*F)*sqrt(diag(var(fat_dat))/n),colMeans(fat_dat) + sqrt((p*(n-1)/(n-p))*F)*sqrt(diag(var(fat_dat))/n))
+
+```
+
+
+b)
+
+```{r}
+variance <- var(fat_dat[,c(2,3)])
+means <- colMeans(fat_dat[,c(2,3)])
+plot(ellipse(variance/n, centre=means, t=sqrt(((p*(n-1)/(n-p))*qf(0.95, p, n-p))))
+     ,type="l")
+```
+
+
+c) Bonferroni Confidence Intervals for the 
+
+```{r}
+circData <- fat_dat
+m <- ncol(circData)
+t2 <- -qt(0.05/(2*m), df=n-1, lower.tail=TRUE)
+intervals <- rbind(colMeans(circData) - t2*sqrt(diag(var(circData))/n), colMeans(circData) + t2*sqrt(diag(var(circData))/n))
+intervals
+
+```
+
+d)
+```{r}
+chestInt <- intervals[,2]
+abInt <- intervals[,3]
+plot(ellipse(variance/n, centre=means, t=sqrt(((p*(n-1)/(n-p))*qf(0.95, p, n-p)))), type="l")
+abline(v=chestInt[1])
+abline(v=chestInt[2])
+abline(h=abInt[1])
+abline(h=abInt[2])
+```
+
+e) The confidence interval for mean chest circumference - mean abdomen circumference is (7.44485, 9.091658).
+```{r}
+m_new = m + 1
+b <- matrix(0, 10, 1)
+b[2] <- 1
+b[3] <- -1
+t_new <- -qt(0.05/(2*m_new), df=n-1)
+cbind(t(b) %*% colMeans(circData) - t_new * sqrt((t(b) %*% var(circData) %*% b)/n),t(b) %*% colMeans(circData) + t_new * sqrt((t(b) %*% var(circData) %*% b)/n))
+```
+

@@ -1,0 +1,62 @@
+---
+title: "STAT 445 Assignment 1"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+1) Exercise 2.25 c-d
+
+```{r}
+#find eigenvalues and eigenvectors of sigma
+sig <- rbind(c(25,-2,4), c(-2,4,1), c(4,1,9))
+eig <- eigen(sig)
+#the eigenvalues
+eig$values
+#the eigenvectors in columns
+eig$vectors
+
+#d)
+diagonal <- diag(sqrt(eig$values))
+inv <- (eig$vectors %*% diagonal) %*% t(eig$vectors)
+inv
+```
+
+7a)
+```{r}
+#a.
+
+fat_dat <- read.table("~/Documents/SFU/STAT445/a1/fat_dat.txt", quote="\"", comment.char="")
+fat <- fat_dat[,2:3]
+Mean <- colMeans(fat)
+Mean
+Covariance <- var(fat)
+Covariance
+```
+
+7b)
+```{r}
+zxy <- cbind(x=rep((-20:100)/2, rep(121, 121)), y = rep((-20:100)/2, 121))
+library(mvtnorm)
+zdata <- matrix(dmvnorm(zxy, mean = c(18.93849, 19.15079), sigma = rbind(c(60.07576, 64.84832), c( 64.84832, 70.03582))), ncol = 121, byrow = T)
+persp((-20:100)/2, (-20:100)/2, zdata, theta = 45, phi = 45, r = 20, expand = .5, xlab = "Brozek", ylab = "Siri", zlab = "density")
+
+```
+
+7c)
+```{r}
+contour((-20:100)/2, (-20:100)/2, zdata)
+```
+
+
+8) By observing the qqplot below, a lot of the data points deviate from the diagonal line therefore the data does not suggest a 10-dimensional multivariate normal distribution.
+```{r}
+circ <- fat_dat[,10:19]
+zd2 <- apply(circ, 1,function(x, mu, sigma)(x-mu) %*% solve(sigma) %*% (x-mu),colMeans(circ), var(circ))
+qqplot(zd2, qchisq(ppoints(zd2)[order(order(zd2))], df=10))
+abline(0,1)
+```
+
+
+
+
